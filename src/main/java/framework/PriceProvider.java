@@ -3,6 +3,6 @@ package framework;
 
 public interface PriceProvider {
 	
-	int getPriceOfPlayer(int playerId, int year);
-
+	public int getPriceOfPlayer(int playerId, int year);
+	public Card getExtendedPriceOfPlayer(int playerId, int year);
 }

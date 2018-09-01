@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 
 import framework.Card;
-import framework.CardList;
+import framework.CardPlaceholder;
+import framework.CardPlaceholderList;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -36,7 +37,7 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-public class GoogleSheetsList extends LinkedList<Card> implements CardList {
+public class GoogleSheetsList extends LinkedList<CardPlaceholder> implements CardPlaceholderList {
 	
 	private Sheets service;
 	
@@ -90,13 +91,13 @@ public class GoogleSheetsList extends LinkedList<Card> implements CardList {
             for (List row : values) {
             	if (row.size() == 1){
             		String name = (String) row.get(0);
-            		Card c = new CardImplementation(-1, name);
+            		CardPlaceholder c = new CardImplementation(-1, name);
             		this.add(c);
             	}
             	if(row.size() == 2){
             		String name = (String) row.get(0);
             		int id = Integer.parseInt(((String)row.get(1)));
-            		Card c = new CardImplementation(id, name);
+            		CardPlaceholder c = new CardImplementation(id, name);
             		this.add(c);
             	}
             }
@@ -140,14 +141,18 @@ public class GoogleSheetsList extends LinkedList<Card> implements CardList {
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 
-    private void setPriceOfCard(Card card, int value){
-    	Integer rownumber = new Integer(this.indexOf(card) + 1);
+    private void setPriceOfCard(CardPlaceholder cardPlaceholder, int value){
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+		setPriceOfCard(cardPlaceholder, value, timeStamp);
+    }
+    
+    private void setPriceOfCard(CardPlaceholder cardPlaceholder, int value, String lastUpdated){
+    	Integer rownumber = new Integer(this.indexOf(cardPlaceholder) + 1);
         String range = tabName + "!" + columnPrice + rownumber.toString();
 		Sheets service = null;
-		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
 		List<ValueRange> values;
 		ValueRange v = new ValueRange()
-				.setValues(Arrays.asList(Arrays.asList(value, timeStamp)));
+				.setValues(Arrays.asList(Arrays.asList(value, lastUpdated)));
 		
 		try {
 			TimeUnit.SECONDS.sleep(2);  // Google API: Max 100 Requests per 100 seconds
@@ -159,8 +164,7 @@ public class GoogleSheetsList extends LinkedList<Card> implements CardList {
 		} catch (GeneralSecurityException | IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-    }
-    
+    }    
     private String readFile(String path) throws IOException {
     	BufferedReader reader = new BufferedReader(new FileReader(path));
     	StringBuilder stringBuilder = new StringBuilder();
@@ -177,7 +181,7 @@ public class GoogleSheetsList extends LinkedList<Card> implements CardList {
     	return stringBuilder.toString();
     }
     
-    private class CardImplementation implements framework.Card {
+    private class CardImplementation implements framework.CardPlaceholder {
 
     	private int cardId;
     	private String playerName;
@@ -205,5 +209,18 @@ public class GoogleSheetsList extends LinkedList<Card> implements CardList {
     		
     	}
 
+		@Override
+		public void setCurrentPrice(int currentPrice, String lastUpdated) {
+    		if(this.cardId != -1) {
+    			setPriceOfCard(this, currentPrice, lastUpdated);
+    		}			
+		}
+
     }
+
+	@Override
+	public void setPriceOfCards(List<Card> cards) {
+		// TODO Auto-generated method stub
+		
+	}
 }

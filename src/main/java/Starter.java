@@ -1,8 +1,9 @@
 import PriceProvider.FutHead.FutHead;
 import CardProvider.GoogleSheets.GoogleSheetsList;
 import framework.Card;
+import framework.CardPlaceholder;
 import framework.PriceProvider;
-import framework.CardList;
+import framework.CardPlaceholderList;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -43,10 +44,14 @@ public class Starter {
 		while(true){
 			timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 			System.out.println(timeStamp + " Starting to update transferlist.");
-			CardList transferlist = new GoogleSheetsList();
-			for(Card c: transferlist){
-				int lowestPrice = futhead.getPriceOfPlayer(c.getCardId(), fifaVersion);
-				c.setCurrentPrice(lowestPrice);
+			CardPlaceholderList transferlist = new GoogleSheetsList();
+			for(CardPlaceholder c: transferlist){
+				//int lowestPrice = futhead.getPriceOfPlayer(c.getCardId(), fifaVersion);
+				Card card = futhead.getExtendedPriceOfPlayer(c.getCardId(), fifaVersion);
+				if (card == null) {
+					continue;
+				}
+				c.setCurrentPrice(card.getLowestPrice(), card.getLastUpdate());
 			}
 			timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 			System.out.println(timeStamp + " Waiting for " + waitInMinutes + " minutes.");
