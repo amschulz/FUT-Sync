@@ -4,25 +4,25 @@ import framework.Card;
 
 public class CardImplementation implements Card {
 
-	private int id;
-	private	int lowest;
-	private int average;
+	private long id;
+	private	long lowest;
+	private long average;
 	private String lastUpdated;
+	private String lastUpdatedScript;
+	private String name;
 	
-	private CardImplementation() {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public CardImplementation(int id, int lowest, int average, String lastUpdated) {
+	public CardImplementation(long id, long lowest, long average, String lastUpdated, String lastUpdatedScript) {
 		this.id = id;
 		this.lowest = lowest;
 		this.average = average;
 		this.lastUpdated = lastUpdated;
+		this.lastUpdatedScript = lastUpdatedScript;
+		this.name = "";
 	}
 
 	@Override
 	public String getName() {
-		return "Kein Name";
+		return this.name;
 	}
 
 	@Override
@@ -31,13 +31,27 @@ public class CardImplementation implements Card {
 	}
 
 	@Override
-	public int getLowestPrice() {
+	public long getLowestPrice() {
 		return lowest;
 	}
 
 	@Override
-	public int getAveragePrice() {
+	public long getAveragePrice() {
 		return average;
 	}
 
+	@Override
+	public String getLastUpdateScript() {
+		return lastUpdatedScript;
+	}
+
+	@Override
+	public long getCardId() {
+		return id;
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
 }

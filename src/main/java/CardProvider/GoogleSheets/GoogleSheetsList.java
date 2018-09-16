@@ -141,12 +141,12 @@ public class GoogleSheetsList extends LinkedList<CardPlaceholder> implements Car
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 
-    private void setPriceOfCard(CardPlaceholder cardPlaceholder, int value){
+    private void setPriceOfCard(CardPlaceholder cardPlaceholder, long value){
 		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
 		setPriceOfCard(cardPlaceholder, value, timeStamp);
     }
     
-    private void setPriceOfCard(CardPlaceholder cardPlaceholder, int value, String lastUpdated){
+    private void setPriceOfCard(CardPlaceholder cardPlaceholder, long value, String lastUpdated){
     	Integer rownumber = new Integer(this.indexOf(cardPlaceholder) + 1);
         String range = tabName + "!" + columnPrice + rownumber.toString();
 		Sheets service = null;
@@ -192,7 +192,7 @@ public class GoogleSheetsList extends LinkedList<CardPlaceholder> implements Car
     	}
 
     	@Override
-    	public int getCardId() {
+    	public long getCardId() {
     		return this.cardId;
     	}
 
@@ -202,7 +202,7 @@ public class GoogleSheetsList extends LinkedList<CardPlaceholder> implements Car
     	}
 
     	@Override
-    	public void setCurrentPrice(int currentPrice) {
+    	public void setCurrentPrice(long currentPrice) {
     		if(this.cardId != -1) {
     			setPriceOfCard(this, currentPrice);
     		}
@@ -210,7 +210,7 @@ public class GoogleSheetsList extends LinkedList<CardPlaceholder> implements Car
     	}
 
 		@Override
-		public void setCurrentPrice(int currentPrice, String lastUpdated) {
+		public void setCurrentPrice(long currentPrice, String lastUpdated) {
     		if(this.cardId != -1) {
     			setPriceOfCard(this, currentPrice, lastUpdated);
     		}			

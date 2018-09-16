@@ -1,8 +1,11 @@
 package framework;
 
 public interface Card {
-	public int getLowestPrice();
-	public int getAveragePrice();
+	public long getCardId();
+	public long getLowestPrice();
+	public long getAveragePrice();
 	public String getName();
 	public String getLastUpdate();
+	public String getLastUpdateScript();
+	public void setName(String name);
 }

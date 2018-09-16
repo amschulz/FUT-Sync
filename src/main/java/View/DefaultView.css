@@ -1,0 +1,17 @@
+.big-label {
+    -fx-font-size: 18px;
+    -fx-alignment: TOP_RIGHT;
+}
+
+.name-table-column {
+	-fx-pref-width: 150px;
+}
+
+.price-table-column {
+	-fx-pref-width: 70px;
+	-fx-alignment: TOP_RIGHT;
+}
+
+.date-table-column {
+	-fx-pref-width: 160px;
+}

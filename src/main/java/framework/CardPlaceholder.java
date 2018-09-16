@@ -2,8 +2,8 @@ package framework;
 
 public interface CardPlaceholder {
 	
-	public int getCardId();
+	public long getCardId();
 	public String getPlayerName();
-	public void setCurrentPrice(int currentPrice);
-	public void setCurrentPrice(int currentPrice, String lastUpdated);
+	public void setCurrentPrice(long currentPrice);
+	public void setCurrentPrice(long currentPrice, String lastUpdated);
 }
