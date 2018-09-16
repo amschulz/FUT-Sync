@@ -1,3 +1,4 @@
+import PriceProvider.FutBin.FutBin;
 import PriceProvider.FutHead.FutHead;
 import View.DefaultView;
 import CardProvider.GoogleSheets.GoogleSheetsList;
@@ -13,8 +14,13 @@ import framework.Controller;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import javafx.application.Application;
@@ -23,7 +29,7 @@ public class Starter extends Application  implements Controller {
 	
 	private static Controller controller;
 	private View view;
-	private static PriceProvider futhead;
+	private static List<PriceProvider> priceProvider;
 	private static int fifaVersion;
 	private static int waitInMinutes;
 	private boolean stopSynchronization;
@@ -42,7 +48,9 @@ public class Starter extends Application  implements Controller {
 	 */
 	public static void main(String[] args) {
 		controller = new Starter();
-		futhead = new FutHead();
+		priceProvider = new ArrayList<PriceProvider>();
+		priceProvider.add(new FutHead());
+		priceProvider.add(new FutBin());
 		String jsoninput = null;
 		try {
 			jsoninput = readFile("src\\main\\java\\config\\ProgrammConfiguration.json");
@@ -78,17 +86,37 @@ public class Starter extends Application  implements Controller {
 	
 	public void startSynchronization() {
 		stopSynchronization = false;
-		String timeStamp;
-		timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		System.out.println(timeStamp + " Starting to update transferlist.");
 		CardPlaceholderList transferlist = new GoogleSheetsList();
 		this.view.setAmountOfCards(transferlist.size());
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
+
 		for(CardPlaceholder c: transferlist){
-			// System.out.println(c.getCardId());
 			if (stopSynchronization) {
 				return;
 			}
-			Card card = futhead.getExtendedPriceOfPlayer(c.getCardId(), fifaVersion);
+			if (c.getCardId() == -1) {
+				continue;
+			}
+			Card card = null;
+			long updatedTime = Long.MIN_VALUE;
+			for(PriceProvider pp: priceProvider) {
+				Card providerCard = pp.getExtendedPriceOfPlayer(c.getCardId(), fifaVersion);
+				if (providerCard == null) {
+					continue;
+				}
+				String update = providerCard.getLastUpdate();
+				Date d = null;
+				try {
+					d = df.parse(update);
+				} catch (ParseException e) {
+					continue;
+				}
+				long time = d.getTime();
+				if (time > updatedTime) {
+					updatedTime = time;
+					card = providerCard;
+				}
+			}
 			if (card == null) {
 				continue;
 			}
@@ -96,8 +124,6 @@ public class Starter extends Application  implements Controller {
 			c.setCurrentPrice(card.getLowestPrice(), card.getLastUpdate());
 			this.view.addCard(card);
 		}
-		timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-		System.out.println(timeStamp + " Waiting for " + waitInMinutes + " minutes.");
 	}
 
 	@Override

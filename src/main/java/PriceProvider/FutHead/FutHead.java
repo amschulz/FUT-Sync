@@ -51,8 +51,7 @@ public class FutHead implements framework.PriceProvider {
 		String lastUpdatedScript = dateFormat.format(new Date());
 		int average = props.getInt("psAvg");
 		int lowest = props.getInt("ps");
-		
-		Card c = new CardImplementation(cardId, average, lowest, lastUpdated, lastUpdatedScript);
+		Card c = new CardImplementation(cardId, lowest, average, lastUpdated, lastUpdatedScript);
 		return c;
 	}
 	
